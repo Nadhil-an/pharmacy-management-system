@@ -1,11 +1,21 @@
 import sqlite3
+import hashlib
 
-# ====================Connect Database And Create Table ==================
+# ==================== Connect Database And Create Table ==================
 
 def database_connection():
     conn = sqlite3.connect('pms.db')
     c=conn.cursor()
-        #   table name
+    return conn,c
+#  ========= UserAuthentication Table =====================
+    c.execute("""
+              CREATE TABLE IF NOT EXISTS USERAUTH(ID INTEGER PRIMARY KEY AUTOINCREMENT,
+              Username TEXT UNIQUE,
+              Password Text)
+""")
+
+
+# ==================== Medicine Table ==========
     c.execute("""  
               CREATE TABLE IF NOT EXISTS PMSDATA (id INTEGER PRIMARY KEY AUTOINCREMENT,
               Name TEXT,
@@ -16,6 +26,50 @@ def database_connection():
               """)
     conn.commit()
     return conn,c
+
+
+#==============  password encryption ===========
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+#=============== User signup Authentication ==========
+
+def signup(conn,c):
+    username = input("Enter the username(signup):")
+    pssword = input("Enter your password(signup):")
+
+    hashed_password = hash_password(pssword)
+
+    c.execute("SELECT * FROM USERAUTH WHERE Username=?",(username,))
+    olduser = c.fetchone()
+
+    if olduser:
+        print("Username Already Existed")
+        return
+
+    c.execute("INSERT INTO USERAUTH (Username,Password) VALUES (?,?)",(username,hashed_password))
+    conn.commit()
+    print("Successfully Registered")
+
+    
+#======================= User login Authentication =====================
+
+def login(conn,c):
+    username = input("Enter the username(login):")
+    userpassword = input("Enter the Password(login) :")
+    
+    hashpassword = hashlib.sha256(userpassword.encode()).hexdigest()
+
+    c.execute("SELECT * FROM USERAUTH WHERE Username = ? AND Password =?",(username,hashpassword))
+    user=c.fetchone()
+    if user:
+        print("Welcome ",username)
+        return True
+    else:
+        print("Invalid username or password! Please Try Again")
+        return False
+ 
 
 # ========================Add Medicine To Database=======================
 def add_medicine(conn,c):
@@ -130,7 +184,7 @@ def search_medicine(c):
         c.execute("SELECT * FROM PMSDATA WHERE Name LIKE ?",('%'+sname+'%',))
     elif search == '2':
         smanufacture = input("Enter The Manufacture Name:")
-        c.execute("SELECT * FROM PMSDATA WHERE Manufacture LIKE ?",('%'+smanufacture+'%'))
+        c.execute("SELECT * FROM PMSDATA WHERE Manufacture LIKE ?",('%'+smanufacture+'%',))
     elif search == '3':
         try:
             sminprice = int(input("Enter The Mininum Price:"))
@@ -183,37 +237,69 @@ def drop_medicine(conn,c):
 
     print(f"{dropingid} Deleted")
 
-
-
-
-
-conn,c = database_connection()
-
 # ====================== Main Interface Of PMS =============================
-while True:
-    print("===================Pharmacy Managment System================")
-    print("1. Show All Medicines")
-    print("2. Add New Medicine")
-    print("3. Update Medicine Details")
-    print("4. Search Medicine")
-    print("5. Delete Medicine")
-    print("6. Exit")
-    print("======================================")
-    choice = input("Enter your choice:")
+def pms_menu(conn,c):
+    while True:
+        print("===================Pharmacy Managment System================")
+        print("1. Show All Medicines")
+        print("2. Add New Medicine")
+        print("3. Update Medicine Details")
+        print("4. Search Medicine")
+        print("5. Delete Medicine")
+        print("6. Exit")
+        print("======================================")
+        try:
+            choice = int(input("Enter your choice:"))
+        except ValueError:
+            print("Use only Numbers")
 
-    if choice == "1":
-        show_medicine(c) 
-    elif choice == "2":
-        add_medicine(conn,c)
-    elif choice == "3":
-        update_medicine(conn,c)
-    elif choice == "4":
-        search_medicine(c)
-    elif choice == "5":
-        drop_medicine(conn,c)
-    elif choice == "6":
-        print("Exit ")
-        break
-    else:
-        print("Sorry !..(Invalid choice)")
+        if choice == 1:
+            show_medicine(c) 
+        elif choice == 2:
+            add_medicine(conn,c)
+        elif choice == 3:
+            update_medicine(conn,c)
+        elif choice == 4:
+            search_medicine(c)
+        elif choice == 5:
+            drop_medicine(conn,c)
+        elif choice == 6:
+            print("Exit ")
+            break
+        else:
+            print("Sorry !..(Invalid choice)")
+
+#======================= PMS Authentication Interface ======================
+
+def pms_main(conn,c):
+    
+    while True:
+        print("1.Signup")
+        print("2.Login")
+        print("3.Logout")
+        print("-"*60)
+        try:
+            auth = int(input("signup or Login:"))
+        except ValueError:
+            print("Use Integer Numbers")
+            print("*"*50)
+            continue
+        if auth == 1:
+            signup(conn,c)
+        elif auth == 2:
+            if login(conn,c):
+                pms_menu(conn,c)
+        elif auth == 3:
+            print("Exit")
+            break
+        else:
+            print("Invalid Choice")
+
+
+
+
+if __name__ == "__main__":
+    conn, c = database_connection()
+    pms_main(conn, c)
+
 
