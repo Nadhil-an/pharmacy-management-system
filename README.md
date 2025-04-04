@@ -28,7 +28,7 @@ User authentication is also implemented using password hashing for secure login 
 🚀 How to Run
 ------------------------------------------------------------------------------------------------------------------
 # Clone the repo
-git clone https://github.com/your-username/pharmacy-management.git
+https://github.com/Nadhil-an/pharmacy-management-system.git
 
 # Navigate to project folder
 cd pharmacy-management
