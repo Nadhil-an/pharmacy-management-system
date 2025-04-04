@@ -44,7 +44,8 @@ Choose Signup (1) to register.
 https://github.com/Nadhil-an/pharmacy-management-system/blob/main/1.png
 
 Choose Login (2) to access the inventory system.
-
+https://github.com/Nadhil-an/pharmacy-management-system/blob/main/2.png
+https://github.com/Nadhil-an/pharmacy-management-system/blob/main/3.png
 
 Navigate through the menu to manage medicine records.
 
