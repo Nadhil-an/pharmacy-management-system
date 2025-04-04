@@ -41,8 +41,10 @@ python main.py
 After running:
 
 Choose Signup (1) to register.
+https://github.com/Nadhil-an/pharmacy-management-system/blob/main/1.png
 
 Choose Login (2) to access the inventory system.
+
 
 Navigate through the menu to manage medicine records.
 
@@ -53,6 +55,9 @@ Choose Logout (3) to exit the authentication system.
 User passwords are stored as hashed values (SHA-256) — not in plain text.
 
 SQLite parameterized queries are used to prevent SQL injection.
+
+
+
 
 
 
